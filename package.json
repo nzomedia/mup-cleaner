@@ -1,0 +1,21 @@
+{
+  "name": "mup-cleaner",
+  "version": "0.0.1",
+  "description": "Meteor-up plugin to uninstall Meteor deployed app and other stuffs installed by Meteor-up.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mup",
+    "meteor-up",
+    "clean",
+    "uninstall"
+  ],
+  "author": "Youssouf",
+  "license": "ISC",
+  "dependencies": {
+    "nodemiral": "^1.1.1",
+    "yargs": "^9.0.1"
+  }
+}
