@@ -5,7 +5,7 @@ METEOR_BASE_IMAGE=<%= meteorBaseImage %>
 #Gather all docker images identified by <repositoryName>/<tag>
 echo Docker images found:
 printf "%-40s | %-.30s\n" "Repository/tag" "Short image ID"
-docker image list | tail +2  | while read repo tag imageId rest
+docker image list | tail -n +2 | while read repo tag imageId rest
 do
   repoAndTag="$repo:$tag"
    printf "%-40s | %-.30s...\n" $repoAndTag $imageId
@@ -13,7 +13,8 @@ done
 echo
 
 # Verify that each given ID is at least 4 caracters long.
-function verifyImageIds {
+function verifyImageIds
+{
     for id in $@
     do
         if [[ ((${#id} < 4)) ]]
@@ -46,3 +47,6 @@ else
         fi
     done
 fi
+
+# résoudre le probleme de blocage de read
+# travailler sur la sauvegarde et la restauration des données.

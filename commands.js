@@ -33,8 +33,20 @@ module.exports = {
                 //for other purposes so with that in mind and for the sake 
                 //of simplicity we'll only deal with the server hosting
                 //the meteor app.
-                const meteorSession = api.getSessions(["meteor"]);
                 const config = api.getConfig();
+                const meteorSession = nodemiral.session(
+                    config.servers.one.host, 
+                    {
+                        username: config.servers.one.username,
+                        password: config.servers.one.password
+                    },
+                    {
+                        ssh: {
+                            port: config.servers.one.opts.port
+                        }
+                    }
+                );
+
 
                 stopServices(api)
                 .then(function(){
@@ -68,7 +80,8 @@ module.exports = {
                         vars: {}
                     });
 
-                    return api.runTaskList(list, meteorSession, {verbose: api.verbose});
+                    // console.log("session meteor:", meteorSession);
+                    return api.runTaskList(list, meteorSession, {verbose: true}); //api.verbose
                     
                 })
                 .then(function(){
