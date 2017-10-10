@@ -3,6 +3,7 @@
 METEOR_BASE_IMAGE=<%= meteorBaseImage %>
 APP_NAME=<%= appName %>
 APP_DOCKER_IMAGE_REPO=mup-$APP_NAME
+SIMULATION=<%= simulation %>
 
 #We build an array containing all Docker images:
 PLUGIN_IMAGES=(${APP_DOCKER_IMAGE_REPO,,}:{"build","latest","previus"} <%= pluginImages %>)
@@ -18,8 +19,12 @@ PLUGIN_IMAGES=(${APP_DOCKER_IMAGE_REPO,,}:{"build","latest","previus"} <%= plugi
 for i in ${!PLUGIN_IMAGES[@]}
 do
     echo "Deleting image ${PLUGIN_IMAGES[$i]}:"
-    #shall we exit on error ? 
-    #docker rmi ${PLUGIN_IMAGES[$i]}
+    #shall we exit on error ?
+    if ! (( SIMULATION ))
+    then
+        :
+        #docker rmi ${PLUGIN_IMAGES[$i]}
+    fi
 done
 
 # résoudre le probleme de blocage de read

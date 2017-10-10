@@ -6,15 +6,27 @@ const nodemiral = require("nodemiral");
  * @param api {Object} mup api object to access configuration and other usefull functions.
  */
 function stopServices(api){
+    if( api.getArgs().indexOf("--deleteEverything") == -1 ){
+        console.log("Execute meteor.stop");
+        console.log("Execute mongo.stop");
+        console.log("Execute mariadb.stop");
+        return Promise.resolve();
+    }
+    function manageError(error){
+        console.log("Error:", error.nodemiralHistory);
+        return Promise.resolve();
+    }
 	return api.runCommand("meteor.stop").then(function(){
 			console.log("Meteor app and container stoped");
 			return api.runCommand("mongo.stop");
-			}).then(function(){
+            }, manageError)
+            .then(function(){
 				console.log("MongoDb server and container stoped");
 				return api.runCommand("mariadb.stop");
-			}).then(function(){
+            }, manageError)
+            .then(function(){
 				console.log("MariaDb server and container stoped");
-			});
+            }, manageError);
 }
 
 module.exports = {
@@ -24,7 +36,19 @@ module.exports = {
      * files.
      */
     uninstall: {
-        description: "Uninstall app and clean everything",
+        description: "Uninstall app and clean everything.\
+        Without \"--deleteEveryting\" flag it only does a simulation.",
+        builder: function(yargs){
+            return yargs.options(
+                {
+                    "deleteEverything": {
+                        description: "Stops the meteor app, deletes containers,\
+                         docker images and all app and DB files.",
+                        type: "boolean",
+                        default: false
+                    }
+                })
+        },
         handler: function(api) {
             try {
                 //We suppose that external servers may be used
@@ -44,8 +68,9 @@ module.exports = {
                         }
                     }
                 );
-
-
+                const simulate = (api.getArgs().indexOf("--deleteEverything") > -1)?0:1;
+                if(simulate)
+                    console.log("------ Simulation (nothing is really performed): --------");
                 stopServices(api)
                 .then(function(){
 
@@ -62,7 +87,8 @@ module.exports = {
                         vars: {
                             appName: api.getConfig().app.name,
                             meteorBaseImage: meteorBaseImage,
-                            pluginImages: "mariadb/latest mongo/" + config.mongo.version
+                            pluginImages: "mariadb/latest mongo/" + config.mongo.version,
+                            simulation: simulate
                         }
                     });
 
@@ -71,29 +97,30 @@ module.exports = {
                         script: api.resolvePath(__dirname, 'assets/deleteFiles.sh'),
                         vars: {
                             appName: api.getConfig().app.name,
-                            paths: ["/opt/"+config.app.name, "/opt/mongodb", "/opt/mariadb"]
+                            paths: ["/opt/"+config.app.name, "/opt/mongodb", "/opt/mariadb"],
+                            simulation: simulate
                         }
                     });
 
                     //uninstall docker
                     list.executeScript("Uninstall dependencies", {
                         script: api.resolvePath(__dirname, 'assets/uninstallDependencies.sh'),
-                        vars: {}
+                        vars: {
+                            simulation: simulate
+                        }
                     });
 
-                    // console.log("session meteor:", meteorSession);
-                    return api.runTaskList(list, meteorSession, {verbose: true}); //api.verbose
-                    
+                    return api.runTaskList(list, meteorSession, {verbose: api.verbose});
                 })
                 .then(function(){
-                    console.log("mup-cleaner finished succesfully.");
+                    if(simulate)
+                        console.log("mup-cleaner simulation finished succesfully.");
+                    else    
+                        console.log("mup-cleaner finished succesfully.");
                 })
-                .catch(function(error){
-                    console.log("mup-cleaner error:", error);
-                });
             }
             catch(error) {
-                console.log("Mup error:", error);
+                console.log("mup-cleaner handler error:", error);
             }
         }
     }

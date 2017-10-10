@@ -1,5 +1,6 @@
 #!/bin/bash
 
+SIMULATION=<%= simulation %>
 filesPath=(
       <% for(var item in paths) { %> <%- paths[item] %> <% } %>
 )
@@ -10,7 +11,11 @@ do
     if [[ -d $path ]]
     then
         echo "Deleting ($path)..."
-        #rm -rf $path
+        if ! (( SIMULATION ))
+        then
+            :
+            #rm -rf $path
+        fi
     else
         echo "Error folder doesn't exist or is not a directory: ($path)."
     fi
