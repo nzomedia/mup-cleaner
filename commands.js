@@ -14,8 +14,6 @@ function stopServices(api){
 				return api.runCommand("mariadb.stop");
 			}).then(function(){
 				console.log("MariaDb server and container stoped");
-			}).catch(function(error){
-				console.log("Erreur:", error);
 			});
 }
 
@@ -62,7 +60,9 @@ module.exports = {
                     list.executeScript("Delete images", {
                         script: api.resolvePath(__dirname, 'assets/deleteImages.sh'),
                         vars: {
+                            appName: api.getConfig().app.name,
                             meteorBaseImage: meteorBaseImage,
+                            pluginImages: "mariadb/latest mongo/" + config.mongo.version
                         }
                     });
 
@@ -70,13 +70,14 @@ module.exports = {
                     list.executeScript("Delete files", {
                         script: api.resolvePath(__dirname, 'assets/deleteFiles.sh'),
                         vars: {
-                            appName: api.getConfig().app.name
+                            appName: api.getConfig().app.name,
+                            paths: ["/opt/"+config.app.name, "/opt/mongodb", "/opt/mariadb"]
                         }
                     });
 
                     //uninstall docker
                     list.executeScript("Uninstall dependencies", {
-                        script: api.resolvePath(__dirname, 'assets/uninstallDependencies'),
+                        script: api.resolvePath(__dirname, 'assets/uninstallDependencies.sh'),
                         vars: {}
                     });
 
