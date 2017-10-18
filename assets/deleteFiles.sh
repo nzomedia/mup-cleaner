@@ -13,8 +13,7 @@ do
         echo "Deleting ($path)..."
         if ! (( SIMULATION ))
         then
-            :
-            #rm -rf $path
+            sudo rm -rf $path
         fi
     else
         echo "Error folder doesn't exist or is not a directory: ($path)."

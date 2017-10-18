@@ -87,7 +87,7 @@ module.exports = {
                         vars: {
                             appName: api.getConfig().app.name,
                             meteorBaseImage: meteorBaseImage,
-                            pluginImages: "mariadb/latest mongo/" + config.mongo.version,
+                            pluginImages: "mariadb mongo:" + config.mongo.version + " " + config.app.docker.image,
                             simulation: simulate
                         }
                     });

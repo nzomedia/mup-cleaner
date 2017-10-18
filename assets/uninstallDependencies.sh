@@ -5,6 +5,5 @@ SIMULATION=<%= simulation %>
 echo "Removing Docker..."
 if ! (( SIMULATION ))
 then
-    :
-    #apt-get remove docker
+    sudo apt-get remove docker
 fi

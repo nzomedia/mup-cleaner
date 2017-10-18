@@ -6,7 +6,7 @@ APP_DOCKER_IMAGE_REPO=mup-$APP_NAME
 SIMULATION=<%= simulation %>
 
 #We build an array containing all Docker images:
-PLUGIN_IMAGES=(${APP_DOCKER_IMAGE_REPO,,}:{"build","latest","previus"} <%= pluginImages %>)
+PLUGIN_IMAGES=(${APP_DOCKER_IMAGE_REPO,,}:{"build","latest","previous"} <%= pluginImages %>)
 
 #List of docker images:
 # echo List of docker images to delete:
@@ -22,10 +22,13 @@ do
     #shall we exit on error ?
     if ! (( SIMULATION ))
     then
-        :
-        #docker rmi ${PLUGIN_IMAGES[$i]}
+        docker rmi ${PLUGIN_IMAGES[$i]}
     fi
 done
+
+echo Removing volumes:
+docker volume prune -f
+echo Unused volumes removed.
 
 # résoudre le probleme de blocage de read
 # travailler sur la sauvegarde et la restauration des données.

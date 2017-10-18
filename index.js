@@ -3,7 +3,7 @@ let _commands = require("./commands");
 
 module.exports = {
   // (optional) Name of plugin. Defaults to name of package
-  name: 'mup-cleaner',
+  name: 'cleaner',
 
   // Description of top-level command, shown in `mup help`
   description: 'Uninstall mup deployed application and clean.',
